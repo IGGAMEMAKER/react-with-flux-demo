@@ -22,16 +22,23 @@ let wannaDelete = {};
 const CE = 'CHANGE_EVENT';
 
 class TodoStore extends EventEmitter {
-    addChangeListener(c: Function) {
+    // addChangeListener(c: Function) {
+    //     this.addListener(CE, c);
+    // }
+    //
+    // removeChangeListener(c: Function) {
+    //     this.removeListener(CE, c);
+    // }
+    redrawButton(c: Function){
         this.addListener(CE, c);
-    }
-
-    removeChangeListener(c: Function) {
-        this.removeListener(CE, c);
     }
 
     emitChange() {
         this.emit(CE);
+    }
+
+    getMarkedIDs(){
+        return wannaDelete;
     }
 }
 
@@ -39,7 +46,7 @@ const store = new TodoStore();
 
 Dispatcher.register((p) => {
     console.log('dispatcher.register');
-    console.log(p);
+    // console.log(p);
     switch (p.actionType) {
         case ADD_TODO:
 
@@ -56,7 +63,7 @@ Dispatcher.register((p) => {
             store.emitChange();
             break;
         case MARK_DELETED:
-            console.log('I AM MARKING DELETED!!!');
+            // console.log('I AM MARKING DELETED!!!');
             let index = p.index;
             let value = p.status;
 
@@ -66,6 +73,7 @@ Dispatcher.register((p) => {
             wannaDelete = was;
             console.log('wannaDelete', wannaDelete);
             store.emitChange();
+            
             break;
 
         default:

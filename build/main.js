@@ -206,21 +206,29 @@
 	        }, _temp), _possibleConstructorReturn(_this, _ret);
 	    }
 
-	    // componentWillMount() {
-	    //     store.addChangeListener(() => {
-	    //         console.log('wilmount');
-	    //     });
-	    // }
-
 	    _createClass(TodoList, [{
-	        key: 'deleteItem',
-	        value: function deleteItem(index) {
+	        key: 'componentWillMount',
+	        value: function componentWillMount() {
 	            var _this2 = this;
 
+	            _TodoStore2.default.redrawButton(function () {
+	                console.log('willmount');
+	                _this2.setState({ wannaDelete: _TodoStore2.default.getMarkedIDs() });
+	            });
+	            _TodoStore2.default.redrawButton(function () {
+	                console.log('willmount');
+	                _this2.setState({ wannaDelete: _TodoStore2.default.getMarkedIDs() });
+	            });
+	        }
+	    }, {
+	        key: 'deleteItem',
+	        value: function deleteItem(index) {
+	            var _this3 = this;
+
 	            return function () {
-	                var list = _this2.state.items;
+	                var list = _this3.state.items;
 	                list.splice(index, 1);
-	                _this2.setState({ items: list });
+	                _this3.setState({ items: list });
 	            };
 	        }
 	    }, {
@@ -4348,19 +4356,27 @@
 	    }
 
 	    _createClass(TodoStore, [{
-	        key: 'addChangeListener',
-	        value: function addChangeListener(c) {
+	        key: 'redrawButton',
+
+	        // addChangeListener(c: Function) {
+	        //     this.addListener(CE, c);
+	        // }
+	        //
+	        // removeChangeListener(c: Function) {
+	        //     this.removeListener(CE, c);
+	        // }
+	        value: function redrawButton(c) {
 	            this.addListener(CE, c);
-	        }
-	    }, {
-	        key: 'removeChangeListener',
-	        value: function removeChangeListener(c) {
-	            this.removeListener(CE, c);
 	        }
 	    }, {
 	        key: 'emitChange',
 	        value: function emitChange() {
 	            this.emit(CE);
+	        }
+	    }, {
+	        key: 'getMarkedIDs',
+	        value: function getMarkedIDs() {
+	            return wannaDelete;
 	        }
 	    }]);
 
@@ -4371,7 +4387,7 @@
 
 	_dispatcher2.default.register(function (p) {
 	    console.log('dispatcher.register');
-	    console.log(p);
+	    // console.log(p);
 	    switch (p.actionType) {
 	        case _TodoConstants.ADD_TODO:
 
@@ -4388,7 +4404,7 @@
 	            store.emitChange();
 	            break;
 	        case _TodoConstants.MARK_DELETED:
-	            console.log('I AM MARKING DELETED!!!');
+	            // console.log('I AM MARKING DELETED!!!');
 	            var index = p.index;
 	            var value = p.status;
 
@@ -4398,6 +4414,7 @@
 	            wannaDelete = was;
 	            console.log('wannaDelete', wannaDelete);
 	            store.emitChange();
+
 	            break;
 
 	        default:

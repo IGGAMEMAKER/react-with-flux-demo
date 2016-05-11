@@ -16,11 +16,16 @@ export default class TodoList extends Component {
         wannaDelete: {}
     };
 
-    // componentWillMount() {
-    //     store.addChangeListener(() => {
-    //         console.log('wilmount');
-    //     });
-    // }
+    componentWillMount() {
+        store.redrawButton(() => {
+            console.log('willmount');
+            this.setState({ wannaDelete: store.getMarkedIDs() });
+        });
+        store.redrawButton(() => {
+            console.log('willmount');
+            this.setState({ wannaDelete: store.getMarkedIDs() });
+        });
+    }
 
     deleteList = () => {
         console.log('deleteList');
@@ -45,6 +50,7 @@ export default class TodoList extends Component {
 
         this.setState({ wannaDelete: {}, items });
     };
+
     getUniqueKey = () => {
         return new Date() + '';
     };
