@@ -117,51 +117,17 @@
 	            proposedText: '',
 	            wannaDelete: {}
 	        }, _this.deleteList = function () {
-	            console.log('deleteList');
-
-	            var list = _this.state.wannaDelete;
-	            var wannaDel = Object.keys(list);
-
-	            var obj = [];
-
-	            wannaDel.forEach(function (id) {
-	                var isMarked = list[id];
-	                if (isMarked) obj.push(id);
-	            });
-
-	            var items = _this.state.items;
-	            for (var i = obj.length - 1; i >= 0; i--) {
-	                var item = obj[i];
-	                console.log('need to delete ', item);
-	                //this.deleteItem(item);
-	                items.splice(item, 1);
-	            };
-
-	            _this.setState({ wannaDelete: {}, items: items });
-	        }, _this.getUniqueKey = function () {
-	            return new Date() + '';
-	        }, _this.addItem = function (text) {
-	            return function () {
-	                if (!text) return;
-	                var list = _this.state.items;
-	                list.push({ text: text, key: _this.getUniqueKey() });
-	                _this.setState({ items: list, proposedText: '' });
-	            };
+	            actions.removeList();
+	        }, _this.addItem = function () {
+	            var text = document.getElementById('textField').value;
+	            if (!text) return;
+	            document.getElementById('textField').value = '';
+	            actions.addItem(text);
 	        }, _this.addWannaDelete = function (index) {
 	            return function (event) {
 	                var status = document.getElementById('wannaDelete' + index).checked;
 	                actions.markForDeleting(index, status);
-
-	                // let targ = document.getElementById('wannaDelete' + index).checked;
-	                //
-	                // let was = this.state.wannaDelete;
-	                //
-	                // was[index] = targ;
-	                // this.setState({ wannaDelete: was });
 	            };
-	        }, _this.handleChange = function (event) {
-	            var value = event.target.value;
-	            _this.setState({ proposedText: value });
 	        }, _this.getItemList = function () {
 	            var items = _this.state.items;
 	            var itemList = _react2.default.createElement(
@@ -170,12 +136,10 @@
 	                ' No todos, sorry '
 	            );
 
-	            if (_this.state.items.length) {
+	            if (items.length) {
 	                itemList = items.map(function (item, index) {
 	                    var id = 'wannaDelete' + index;
-	                    // let key = index;//+'_'+new Date();
 	                    var key = item.key;
-	                    // console.log(key);
 	                    return _react2.default.createElement(
 	                        'li',
 	                        { key: key },
@@ -190,19 +154,6 @@
 	                });
 	            }
 	            return itemList;
-	        }, _this.getDeleteListButton = function () {
-	            var deleteListButton = _react2.default.createElement('input', { type: 'button', value: 'Delete all', onClick: _this.deleteList });
-	            var deleteList = '';
-
-	            var list = _this.state.wannaDelete;
-	            var wannaDel = Object.keys(list);
-
-	            wannaDel.forEach(function (id, index) {
-	                console.log(id, index);
-	                var isMarked = list[id];
-	                if (isMarked) deleteList = deleteListButton;
-	            });
-	            return deleteList;
 	        }, _temp), _possibleConstructorReturn(_this, _ret);
 	    }
 
@@ -212,13 +163,15 @@
 	            var _this2 = this;
 
 	            _TodoStore2.default.redrawButton(function () {
-	                console.log('willmount');
-	                _this2.setState({ wannaDelete: _TodoStore2.default.getMarkedIDs() });
+	                _this2.setState({
+	                    wannaDelete: _TodoStore2.default.getMarkedIDs(),
+	                    items: _TodoStore2.default.getItems()
+	                });
 	            });
-	            _TodoStore2.default.redrawButton(function () {
-	                console.log('willmount');
-	                _this2.setState({ wannaDelete: _TodoStore2.default.getMarkedIDs() });
-	            });
+	            // store.addChangeListener(() => {
+	            //     console.log('redrawList');
+	            //     this.setState({ items: store.getItems() });
+	            // });
 	        }
 	    }, {
 	        key: 'deleteItem',
@@ -231,18 +184,19 @@
 	                _this3.setState({ items: list });
 	            };
 	        }
+
+	        // handleChange = (event) => {
+	        //     let value = event.target.value;
+	        //     this.setState({ proposedText: value });
+	        // };
+
 	    }, {
 	        key: 'render',
 	        value: function render() {
 	            var itemList = this.getItemList();
-	            var deleteListButton = this.getDeleteListButton();
 
-	            var addItemButton = _react2.default.createElement(
-	                'div',
-	                null,
-	                _react2.default.createElement('input', { id: 'textField', type: 'text', onChange: this.handleChange, value: this.state.proposedText }),
-	                _react2.default.createElement('input', { type: 'submit', value: 'Add', onClick: this.addItem(this.state.proposedText) })
-	            );
+	            //let deleteListButton = this.getDeleteListButton();
+	            var deleteListButton = _TodoStore2.default.markedItemsExist() ? _react2.default.createElement('input', { type: 'button', value: 'Delete all', onClick: this.deleteList }) : '';
 
 	            return _react2.default.createElement(
 	                'div',
@@ -255,7 +209,8 @@
 	                _react2.default.createElement(
 	                    'div',
 	                    null,
-	                    addItemButton
+	                    _react2.default.createElement('input', { id: 'textField', type: 'text' }),
+	                    _react2.default.createElement('input', { type: 'submit', value: 'Add', onClick: this.addItem })
 	                ),
 	                _react2.default.createElement(
 	                    'div',
@@ -4350,24 +4305,41 @@
 	    _inherits(TodoStore, _EventEmitter);
 
 	    function TodoStore() {
+	        var _Object$getPrototypeO;
+
+	        var _temp, _this, _ret;
+
 	        _classCallCheck(this, TodoStore);
 
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(TodoStore).apply(this, arguments));
+	        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+	            args[_key] = arguments[_key];
+	        }
+
+	        return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_Object$getPrototypeO = Object.getPrototypeOf(TodoStore)).call.apply(_Object$getPrototypeO, [this].concat(args))), _this), _this.getUniqueKey = function () {
+	            return new Date() + '';
+	        }, _temp), _possibleConstructorReturn(_this, _ret);
 	    }
 
 	    _createClass(TodoStore, [{
-	        key: 'redrawButton',
-
-	        // addChangeListener(c: Function) {
-	        //     this.addListener(CE, c);
-	        // }
+	        key: 'addChangeListener',
+	        value: function addChangeListener(c) {
+	            this.addListener(CE, c);
+	        }
 	        //
 	        // removeChangeListener(c: Function) {
 	        //     this.removeListener(CE, c);
 	        // }
+
+	    }, {
+	        key: 'redrawButton',
 	        value: function redrawButton(c) {
 	            this.addListener(CE, c);
 	        }
+
+	        // addListener(message, callback){
+	        //     this.addListener(message, )
+	        // }
+
 	    }, {
 	        key: 'emitChange',
 	        value: function emitChange() {
@@ -4376,7 +4348,27 @@
 	    }, {
 	        key: 'getMarkedIDs',
 	        value: function getMarkedIDs() {
-	            return wannaDelete;
+	            //return wannaDelete;
+	            return Object.assign({}, wannaDelete);
+	        }
+	    }, {
+	        key: 'getItems',
+	        value: function getItems() {
+	            return items;
+	        }
+	    }, {
+	        key: 'markedItemsExist',
+	        value: function markedItemsExist() {
+	            var list = this.getMarkedIDs();
+	            var wannaDel = Object.keys(list);
+
+	            var exists = false;
+	            wannaDel.forEach(function (id, index) {
+	                // console.log(id, index);
+	                var isMarked = list[id];
+	                if (isMarked) exists = true;
+	            });
+	            return exists;
 	        }
 	    }]);
 
@@ -4386,10 +4378,14 @@
 	var store = new TodoStore();
 
 	_dispatcher2.default.register(function (p) {
-	    console.log('dispatcher.register');
+	    // console.log('dispatcher.register');
 	    // console.log(p);
 	    switch (p.actionType) {
 	        case _TodoConstants.ADD_TODO:
+	            var text = p.text;
+	            console.log('ADD_TODO', items);
+
+	            items.push({ text: text, key: store.getUniqueKey() });
 
 	            store.emitChange();
 	            break;
@@ -4400,7 +4396,25 @@
 	            break;
 
 	        case _TodoConstants.REMOVE_LIST:
+	            console.log('deleteList');
 
+	            var obj = [];
+
+	            var list = Object.assign({}, wannaDelete);
+	            var wannaDel = Object.keys(list);
+
+	            wannaDel.forEach(function (id) {
+	                var isMarked = list[id];
+	                if (isMarked) obj.push(id);
+	            });
+
+	            for (var i = obj.length - 1; i >= 0; i--) {
+	                var item = obj[i];
+	                console.log('need to delete ', item);
+	                //this.deleteItem(item);
+	                items.splice(item, 1);
+	            };
+	            wannaDelete = {};
 	            store.emitChange();
 	            break;
 	        case _TodoConstants.MARK_DELETED:

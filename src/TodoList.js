@@ -18,49 +18,32 @@ export default class TodoList extends Component {
 
     componentWillMount() {
         store.redrawButton(() => {
-            console.log('willmount');
-            this.setState({ wannaDelete: store.getMarkedIDs() });
+            this.setState({
+                wannaDelete: store.getMarkedIDs(),
+                items: store.getItems(),
+            });
         });
-        store.redrawButton(() => {
-            console.log('willmount');
-            this.setState({ wannaDelete: store.getMarkedIDs() });
-        });
+        // store.addChangeListener(() => {
+        //     console.log('redrawList');
+        //     this.setState({ items: store.getItems() });
+        // });
     }
 
     deleteList = () => {
-        console.log('deleteList');
-
-        let list = this.state.wannaDelete;
-        let wannaDel = Object.keys(list);
-
-        let obj = [];
-
-        wannaDel.forEach((id) => {
-            let isMarked = list[id];
-            if (isMarked) obj.push(id);
-        });
-
-        let items = this.state.items;
-        for (let i = obj.length - 1; i >= 0; i--) {
-            let item = obj[i];
-            console.log('need to delete ', item);
-            //this.deleteItem(item);
-            items.splice(item, 1);
-        };
-
-        this.setState({ wannaDelete: {}, items });
+        actions.removeList();
     };
 
-    getUniqueKey = () => {
-        return new Date() + '';
+    addItem = () => {
+        let text = document.getElementById('textField').value;
+        if (!text) return;
+        document.getElementById('textField').value = '';
+        actions.addItem(text);
     };
-    
-    addItem = (text) => {
-        return () => {
-            if (!text) return;
-            let list = this.state.items;
-            list.push({ text, key: this.getUniqueKey() });
-            this.setState({ items: list, proposedText: '' });
+
+    addWannaDelete = (index) => {
+        return (event) => {
+            let status = document.getElementById('wannaDelete' + index).checked;
+            actions.markForDeleting(index, status);
         };
     };
 
@@ -72,35 +55,19 @@ export default class TodoList extends Component {
         };
     };
 
-    addWannaDelete = (index) => {
-        return (event) => {
-            let status = document.getElementById('wannaDelete' + index).checked;
-            actions.markForDeleting(index, status);
-
-            // let targ = document.getElementById('wannaDelete' + index).checked;
-            //
-            // let was = this.state.wannaDelete;
-            //
-            // was[index] = targ;
-            // this.setState({ wannaDelete: was });
-        };
-    };
-
-    handleChange = (event) => {
-        let value = event.target.value;
-        this.setState({ proposedText: value });
-    };
+    // handleChange = (event) => {
+    //     let value = event.target.value;
+    //     this.setState({ proposedText: value });
+    // };
 
     getItemList = () => {
         let items = this.state.items;
         let itemList = <li> No todos, sorry </li>;
 
-        if (this.state.items.length) {
+        if (items.length) {
             itemList = items.map((item, index) => {
                 let id = 'wannaDelete' + index;
-                // let key = index;//+'_'+new Date();
                 let key = item.key;
-                // console.log(key);
                 return (
                     <li key={key}>
                         <input type="checkbox" id={id} name="wannaDelete" onChange={this.addWannaDelete(index)} />
@@ -113,36 +80,21 @@ export default class TodoList extends Component {
         return itemList;
     };
 
-    getDeleteListButton = () => {
-        const deleteListButton = <input type="button" value="Delete all" onClick={this.deleteList} />;
-        let deleteList = '';
-
-        let list = this.state.wannaDelete;
-        let wannaDel = Object.keys(list);
-
-        wannaDel.forEach(function (id, index) {
-            console.log(id, index);
-            let isMarked = list[id];
-            if (isMarked) deleteList = deleteListButton;
-        });
-        return deleteList;
-    };
-
     render() {
         let itemList = this.getItemList();
-        let deleteListButton = this.getDeleteListButton();
 
-        let addItemButton = (
-            <div>
-                <input id="textField" type="text" onChange={this.handleChange} value={this.state.proposedText} />
-                <input type="submit" value="Add" onClick={this.addItem(this.state.proposedText)} />
-            </div>
-        );
+        //let deleteListButton = this.getDeleteListButton();
+        let deleteListButton = store.markedItemsExist() ?
+            <input type="button" value="Delete all" onClick={this.deleteList} /> :
+            '';
 
         return (
             <div>
                 <ul>{itemList}</ul>
-                <div>{addItemButton}</div>
+                <div>
+                    <input id="textField" type="text" />
+                    <input type="submit" value="Add" onClick={this.addItem} />
+                </div>
                 <div>{deleteListButton}</div>
             </div>
         );
