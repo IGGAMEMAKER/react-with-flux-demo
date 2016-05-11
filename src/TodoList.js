@@ -5,28 +5,15 @@ import * as actions from '../actions/TodoActions';
 import store from '../stores/TodoStore';
 
 export default class TodoList extends Component {
-    state = {
-        items: [
-            { text: 'txttt', key: 0 },
-            { text: 'Тудушка', key: 1 },
-            { text: 'Тудушка2', key: 2 },
-            { text: 'Тудушка3', key: 3 },
-        ],
-        proposedText: '',
-        wannaDelete: {}
-    };
+    state = {};
 
     componentWillMount() {
-        store.redrawButton(() => {
+        store.redraw(() => {
             this.setState({
-                wannaDelete: store.getMarkedIDs(),
+                markedIDs: store.getMarkedIDs(),
                 items: store.getItems(),
             });
         });
-        // store.addChangeListener(() => {
-        //     console.log('redrawList');
-        //     this.setState({ items: store.getItems() });
-        // });
     }
 
     deleteList = () => {
@@ -50,19 +37,11 @@ export default class TodoList extends Component {
     deleteItem(index) {
         return () => {
             actions.removeItem(index);
-            // let list = this.state.items;
-            // list.splice(index, 1);
-            // this.setState({ items: list });
         };
     };
 
-    // handleChange = (event) => {
-    //     let value = event.target.value;
-    //     this.setState({ proposedText: value });
-    // };
-
     getItemList = () => {
-        let items = this.state.items;
+        let items = store.getItems();
         let itemList = <li> No todos, sorry </li>;
 
         if (items.length) {

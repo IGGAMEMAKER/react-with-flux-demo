@@ -16,8 +16,7 @@ let items = [
     { text: 'Тудушка2', key: 2 },
     { text: 'Тудушка3', key: 3 },
 ];
-let proposedText = '';
-let wannaDelete = {};
+let markedIDs = {};
 
 const CE = 'CHANGE_EVENT';
 
@@ -29,7 +28,7 @@ class TodoStore extends EventEmitter {
     // removeChangeListener(c: Function) {
     //     this.removeListener(CE, c);
     // }
-    redrawButton(c: Function){
+    redraw(c: Function) {
         this.addListener(CE, c);
     }
 
@@ -42,8 +41,8 @@ class TodoStore extends EventEmitter {
     }
 
     getMarkedIDs() {
-        //return wannaDelete;
-        return Object.assign({}, wannaDelete);
+        //return markedIDs;
+        return Object.assign({}, markedIDs);
     }
 
     getItems() {
@@ -56,7 +55,6 @@ class TodoStore extends EventEmitter {
 
         let exists = false;
         wannaDel.forEach(function (id, index) {
-            // console.log(id, index);
             let isMarked = list[id];
             if (isMarked) exists = true;
         });
@@ -93,7 +91,7 @@ Dispatcher.register((p) => {
 
             let obj = [];
 
-            let list = Object.assign({}, wannaDelete);
+            let list = Object.assign({}, markedIDs);
             let wannaDel = Object.keys(list);
 
             wannaDel.forEach((id) => {
@@ -107,7 +105,7 @@ Dispatcher.register((p) => {
                 //this.deleteItem(item);
                 items.splice(item, 1);
             };
-            wannaDelete = {};
+            markedIDs = {};
             store.emitChange();
             break;
 
@@ -116,11 +114,10 @@ Dispatcher.register((p) => {
             let index = p.index;
             let value = p.status;
 
-            let was = Object.assign({}, wannaDelete);
+            let was = Object.assign({}, markedIDs);
 
             was[index] = value;
-            wannaDelete = was;
-            console.log('wannaDelete', wannaDelete);
+            markedIDs = was;
             store.emitChange();
 
             break;

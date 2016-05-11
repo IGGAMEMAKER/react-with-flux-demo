@@ -112,11 +112,7 @@
 	            args[_key] = arguments[_key];
 	        }
 
-	        return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_Object$getPrototypeO = Object.getPrototypeOf(TodoList)).call.apply(_Object$getPrototypeO, [this].concat(args))), _this), _this.state = {
-	            items: [{ text: 'txttt', key: 0 }, { text: 'Тудушка', key: 1 }, { text: 'Тудушка2', key: 2 }, { text: 'Тудушка3', key: 3 }],
-	            proposedText: '',
-	            wannaDelete: {}
-	        }, _this.deleteList = function () {
+	        return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_Object$getPrototypeO = Object.getPrototypeOf(TodoList)).call.apply(_Object$getPrototypeO, [this].concat(args))), _this), _this.state = {}, _this.deleteList = function () {
 	            actions.removeList();
 	        }, _this.addItem = function () {
 	            var text = document.getElementById('textField').value;
@@ -129,7 +125,7 @@
 	                actions.markForDeleting(index, status);
 	            };
 	        }, _this.getItemList = function () {
-	            var items = _this.state.items;
+	            var items = _TodoStore2.default.getItems();
 	            var itemList = _react2.default.createElement(
 	                'li',
 	                null,
@@ -162,33 +158,20 @@
 	        value: function componentWillMount() {
 	            var _this2 = this;
 
-	            _TodoStore2.default.redrawButton(function () {
+	            _TodoStore2.default.redraw(function () {
 	                _this2.setState({
-	                    wannaDelete: _TodoStore2.default.getMarkedIDs(),
+	                    markedIDs: _TodoStore2.default.getMarkedIDs(),
 	                    items: _TodoStore2.default.getItems()
 	                });
 	            });
-	            // store.addChangeListener(() => {
-	            //     console.log('redrawList');
-	            //     this.setState({ items: store.getItems() });
-	            // });
 	        }
 	    }, {
 	        key: 'deleteItem',
 	        value: function deleteItem(index) {
 	            return function () {
 	                actions.removeItem(index);
-	                // let list = this.state.items;
-	                // list.splice(index, 1);
-	                // this.setState({ items: list });
 	            };
 	        }
-
-	        // handleChange = (event) => {
-	        //     let value = event.target.value;
-	        //     this.setState({ proposedText: value });
-	        // };
-
 	    }, {
 	        key: 'render',
 	        value: function render() {
@@ -4295,8 +4278,7 @@
 
 
 	var items = [{ text: 'txttt', key: 0 }, { text: 'Тудушка', key: 1 }, { text: 'Тудушка2', key: 2 }, { text: 'Тудушка3', key: 3 }];
-	var proposedText = '';
-	var wannaDelete = {};
+	var markedIDs = {};
 
 	var CE = 'CHANGE_EVENT';
 
@@ -4330,8 +4312,8 @@
 	        // }
 
 	    }, {
-	        key: 'redrawButton',
-	        value: function redrawButton(c) {
+	        key: 'redraw',
+	        value: function redraw(c) {
 	            this.addListener(CE, c);
 	        }
 
@@ -4347,8 +4329,8 @@
 	    }, {
 	        key: 'getMarkedIDs',
 	        value: function getMarkedIDs() {
-	            //return wannaDelete;
-	            return Object.assign({}, wannaDelete);
+	            //return markedIDs;
+	            return Object.assign({}, markedIDs);
 	        }
 	    }, {
 	        key: 'getItems',
@@ -4363,7 +4345,6 @@
 
 	            var exists = false;
 	            wannaDel.forEach(function (id, index) {
-	                // console.log(id, index);
 	                var isMarked = list[id];
 	                if (isMarked) exists = true;
 	            });
@@ -4399,7 +4380,7 @@
 
 	            var obj = [];
 
-	            var list = Object.assign({}, wannaDelete);
+	            var list = Object.assign({}, markedIDs);
 	            var wannaDel = Object.keys(list);
 
 	            wannaDel.forEach(function (id) {
@@ -4413,7 +4394,7 @@
 	                //this.deleteItem(item);
 	                items.splice(item, 1);
 	            };
-	            wannaDelete = {};
+	            markedIDs = {};
 	            store.emitChange();
 	            break;
 
@@ -4422,11 +4403,10 @@
 	            var index = p.index;
 	            var value = p.status;
 
-	            var was = Object.assign({}, wannaDelete);
+	            var was = Object.assign({}, markedIDs);
 
 	            was[index] = value;
-	            wannaDelete = was;
-	            console.log('wannaDelete', wannaDelete);
+	            markedIDs = was;
 	            store.emitChange();
 
 	            break;
