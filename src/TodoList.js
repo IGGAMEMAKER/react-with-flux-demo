@@ -49,9 +49,10 @@ export default class TodoList extends Component {
 
     deleteItem(index) {
         return () => {
-            let list = this.state.items;
-            list.splice(index, 1);
-            this.setState({ items: list });
+            actions.removeItem(index);
+            // let list = this.state.items;
+            // list.splice(index, 1);
+            // this.setState({ items: list });
         };
     };
 

@@ -176,12 +176,11 @@
 	    }, {
 	        key: 'deleteItem',
 	        value: function deleteItem(index) {
-	            var _this3 = this;
-
 	            return function () {
-	                var list = _this3.state.items;
-	                list.splice(index, 1);
-	                _this3.setState({ items: list });
+	                actions.removeItem(index);
+	                // let list = this.state.items;
+	                // list.splice(index, 1);
+	                // this.setState({ items: list });
 	            };
 	        }
 
@@ -4391,7 +4390,7 @@
 	            break;
 
 	        case _TodoConstants.REMOVE_TODO:
-	            _lastAnsweredQuestionId = p.id;
+	            items.splice(p.index, 1);
 	            store.emitChange();
 	            break;
 
@@ -4417,6 +4416,7 @@
 	            wannaDelete = {};
 	            store.emitChange();
 	            break;
+
 	        case _TodoConstants.MARK_DELETED:
 	            // console.log('I AM MARKING DELETED!!!');
 	            var index = p.index;

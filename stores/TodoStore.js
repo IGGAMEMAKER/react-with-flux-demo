@@ -84,7 +84,7 @@ Dispatcher.register((p) => {
             break;
 
         case REMOVE_TODO:
-            _lastAnsweredQuestionId = p.id;
+            items.splice(p.index, 1);
             store.emitChange();
             break;
 
@@ -110,6 +110,7 @@ Dispatcher.register((p) => {
             wannaDelete = {};
             store.emitChange();
             break;
+
         case MARK_DELETED:
             // console.log('I AM MARKING DELETED!!!');
             let index = p.index;
@@ -121,7 +122,7 @@ Dispatcher.register((p) => {
             wannaDelete = was;
             console.log('wannaDelete', wannaDelete);
             store.emitChange();
-            
+
             break;
 
         default:
