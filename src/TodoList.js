@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
 import TodoItem from './TodoItem';
 
+import * as actions from '../actions/TodoActions';
+import store from '../stores/TodoStore';
+
 export default class TodoList extends Component {
-    /* constructor(props) {
-     super(props);
-     this.
-     let context = this;
-     }*/
     state = {
         items: [
             { text: 'txttt', key: 0 },
@@ -17,6 +15,12 @@ export default class TodoList extends Component {
         proposedText: '',
         wannaDelete: {}
     };
+
+    // componentWillMount() {
+    //     store.addChangeListener(() => {
+    //         console.log('wilmount');
+    //     });
+    // }
 
     deleteList = () => {
         console.log('deleteList');
@@ -43,7 +47,8 @@ export default class TodoList extends Component {
     };
     getUniqueKey = () => {
         return new Date() + '';
-    }
+    };
+    
     addItem = (text) => {
         return () => {
             if (!text) return;
@@ -59,16 +64,19 @@ export default class TodoList extends Component {
             list.splice(index, 1);
             this.setState({ items: list });
         };
-    }
+    };
 
     addWannaDelete = (index) => {
         return (event) => {
-            let targ = document.getElementById('wannaDelete' + index).checked;
+            let status = document.getElementById('wannaDelete' + index).checked;
+            actions.markForDeleting(index, status);
 
-            let was = this.state.wannaDelete;
-
-            was[index] = targ;
-            this.setState({ wannaDelete: was });
+            // let targ = document.getElementById('wannaDelete' + index).checked;
+            //
+            // let was = this.state.wannaDelete;
+            //
+            // was[index] = targ;
+            // this.setState({ wannaDelete: was });
         };
     };
 
